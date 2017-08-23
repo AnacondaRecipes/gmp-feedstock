@@ -2,8 +2,11 @@
 
 chmod +x configure
 
-./configure --prefix=$PREFIX --enable-cxx --enable-fat
+./configure --prefix=${PREFIX}  \
+             --host=${HOST}     \
+             --enable-cxx       \
+             --enable-fat
 
-make
+make -j${CPU_COUNT}
 make check
 make install
