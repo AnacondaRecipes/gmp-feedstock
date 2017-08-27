@@ -7,6 +7,6 @@ chmod +x configure
              --enable-cxx       \
              --enable-fat
 
-make -j${CPU_COUNT}
+make -j${CPU_COUNT} ${VERBOSE_AT}
 make check
 make install
