@@ -20,6 +20,8 @@ requirements:
     - m4
 
 test:
+  requires:
+    - {{ compiler('c') }}
   files:
     - test.c
 
