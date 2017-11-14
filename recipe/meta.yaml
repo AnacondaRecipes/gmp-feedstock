@@ -10,8 +10,12 @@ source:
   sha256: 5275bb04f4863a13516b2f39392ac5e272f5e1bb8057b18aec1c9b79d73d8fb2
 
 build:
-  number: 0
+  number: 1
   skip: true  # [win]
+  run_exports:
+    # excellent, even across major ver:
+    #  https://abi-laboratory.pro/tracker/timeline/gmp/
+    - {{ pin_subpackage('gmp', max_pin=None) }}
 
 requirements:
   build:
