@@ -25,6 +25,7 @@ requirements:
     - {{ compiler('cxx') }}
     - m4
     - make
+    - patch  # [unix]
   host:
 
 test:
