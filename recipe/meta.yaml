@@ -1,5 +1,6 @@
 {% set name = "gmp" %}
 {% set version = "6.3.0" %}
+{% set am_version = "1.15" %} #  keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
 
