@@ -11,7 +11,7 @@ source:
 
 build:
   number: 0
-  #skip: true  # [win]
+  skip: true  # [not win]
   run_exports:
     # excellent, even across major ver:
     #  https://abi-laboratory.pro/tracker/timeline/gmp/
@@ -24,6 +24,7 @@ requirements:
     - {{ compiler('cxx') }}
     - m4    # [unix]
     - make  # [unix]
+    - cmake  # [win]
     - pkg-config
   host:
 
