@@ -13,9 +13,10 @@ GMP_HOST=$HOST
 
 ../configure --prefix="$PREFIX" --enable-cxx --enable-fat --host="$GMP_HOST"
 
-make -j"${CPU_COUNT}" "${VERBOSE_AT}"
+# Do not use parallel builds as they will fail with the error "make: *** empty string invalid as file name.  Stop."
+make
 if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
-    make check -j"${CPU_COUNT}"
+    make check
 fi
 make install
 

@@ -1,12 +1,13 @@
+{% set name = "gmp" %}
 {% set version = "6.3.0" %}
 
 package:
-  name: gmp
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://gmplib.org/download/gmp/gmp-{{ version }}.tar.bz2
-  sha256: a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898
+  url: https://gmplib.org/download/{{ name }}/{{ name }}-{{ version }}.tar.bz2
+  sha256: ac28211a7cfb609bae2e2c8d6058d66c8fe96434f740cf6fe2e47b000d1c20cb
 
 build:
   number: 0
@@ -23,6 +24,7 @@ requirements:
     - {{ compiler('cxx') }}
     - m4    # [unix]
     - make  # [unix]
+    - pkg-config
   host:
 
 test:
@@ -30,7 +32,6 @@ test:
     - {{ compiler('c') }}
   files:
     - test.c
-
   commands:
     - test -f ${PREFIX}/lib/libgmp.a        # [unix]
     - test -f ${PREFIX}/lib/libgmp.dylib    # [osx]
@@ -42,8 +43,17 @@ test:
 about:
   home: https://gmplib.org/
   license: GPL-2.0-or-later AND LGPL-3.0-or-later
-  license_file: COPYING.LESSERv3
+  license_family: Other
+  license_file:
+    - COPYING.LESSERv3
+    - COPYINGv2
+    - COPYINGv3
   summary: The GNU multiprecision library.
+  description: |
+    GNU MP is a portable library written in C for arbitrary precision arithmetic on integers,
+    rational numbers, and floating-point numbers.
+    It aims to provide the fastest possible arithmetic for all applications
+    that need higher precision than is directly supported by the basic C types.
   dev_url: https://gmplib.org/repo/
   doc_url: https://gmplib.org/manual/
 
