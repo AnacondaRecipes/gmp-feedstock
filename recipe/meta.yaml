@@ -23,8 +23,8 @@ build:
 requirements:
   build:
     - gnuconfig  # [unix]
-    - {{ compiler('c') }}  # [not win]
-    - {{ compiler('cxx') }}  # [not win]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - m4    # [unix]
     - make  # [unix]
     - pkg-config
