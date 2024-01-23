@@ -1,4 +1,4 @@
-{% set version = "6.2.1" %}
+{% set version = "6.3.0" %}
 
 package:
   name: gmp
@@ -6,13 +6,11 @@ package:
 
 source:
   url: https://gmplib.org/download/gmp/gmp-{{ version }}.tar.bz2
-  sha256: eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c
-  patches:
-    - 0000-Avoid-the-x18-register.patch
+  sha256: a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898
 
 build:
-  number: 3
-  skip: true  # [win]
+  number: 0
+  #skip: true  # [win]
   run_exports:
     # excellent, even across major ver:
     #  https://abi-laboratory.pro/tracker/timeline/gmp/
@@ -23,9 +21,8 @@ requirements:
     - gnuconfig  # [unix]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - m4
-    - make
-    - patch  # [unix]
+    - m4    # [unix]
+    - make  # [unix]
   host:
 
 test:
