@@ -1,4 +1,6 @@
 {% set version = "6.2.1" %}
+{% set posix = 'm2-' if win else '' %}
+{% set am_version = "1.15" %} #  keep synchronized with build.sh
 
 package:
   name: gmp
@@ -11,21 +13,29 @@ source:
     - 0000-Avoid-the-x18-register.patch
 
 build:
-  number: 3
-  skip: true  # [win]
+  number: 4
+  skip: true  # [not win]
   run_exports:
     # excellent, even across major ver:
     #  https://abi-laboratory.pro/tracker/timeline/gmp/
     - {{ pin_subpackage("gmp") }}
 
 requirements:
-  build:
-    - gnuconfig  # [unix]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-    - m4
-    - make
-    - patch  # [unix]
+  build:              
+    - gnuconfig
+    - {{ compiler('m2w64_c') }}         # [win]
+    - {{ compiler('m2w64_cxx') }}       # [win]
+    - {{posix}}m4
+    - {{posix}}make
+    - {{posix}}patch
+    - posix                     # [win]
+    - {{posix}}autoconf                   # [win]
+    - {{posix}}automake{{ am_version }}   # [win]
+    - {{posix}}libtool                    # [win]
+    - {{posix}}pkg-config                    
+    - {{posix}}automake-wrapper
+    - {{posix}}sed
+
   host:
 
 test:
@@ -41,6 +51,12 @@ test:
     - test -f ${PREFIX}/lib/libgmpxx.a      # [unix]
     - test -f ${PREFIX}/lib/libgmpxx.dylib  # [osx]
     - test -f ${PREFIX}/lib/libgmpxx.so     # [linux]
+    - dir /s %PREFIX%\Library\ # [win]
+    - if not exist %PREFIX%\Library\mingw-w64\bin\libgmp-10.dll exit /b 1  # [win]
+    - if not exist %PREFIX%\Library\mingw-w64\bin\libgmpxx-4.dll exit /b 1  # [win]
+    - if not exist %PREFIX%\Library\mingw-w64\include\gmp.h exit /b 1  # [win]
+    - if not exist %PREFIX%\Library\mingw-w64\lib\libgmp.a exit /b 1  # [win]
+
 
 about:
   home: https://gmplib.org/

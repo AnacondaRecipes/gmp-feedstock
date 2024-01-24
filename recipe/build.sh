@@ -1,48 +1,51 @@
 #!/bin/bash
+
+set -e
+
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.guess config.fsf.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.sub config.fsf.sub
 
-shopt -s extglob
-chmod +x configure
+IFS=$' \t\n' # workaround for conda 4.2.13+toolchain bug
+
+# Adopt a Unix-friendly path if we're on Windows (see bld.bat).
+[ -n "$PATH_OVERRIDE" ] && export PATH="$PATH_OVERRIDE"
+
+# On Windows we want $LIBRARY_PREFIX in both "mixed" (C:/Conda/...) and Unix
+# (/c/Conda) forms, but Unix form is often "/" which can cause problems.
+if [ -n "$LIBRARY_PREFIX_M" ] ; then
+    mprefix="$LIBRARY_PREFIX_M"
+    if [ "$LIBRARY_PREFIX_U" = / ] ; then
+        uprefix=""
+    else
+        uprefix="$LIBRARY_PREFIX_U"
+    fi
+else
+    mprefix="$PREFIX"
+    uprefix="$PREFIX"
+fi
+
+# On Windows we need to regenerate the configure scripts.
+if [ -n "$CYGWIN_PREFIX" ] ; then
+    am_version=1.15 # keep sync'ed with meta.yaml
+    export ACLOCAL=aclocal-$am_version
+    export AUTOMAKE=automake-$am_version
+    autoreconf_args=(
+        --force
+        --install
+        -I "$mprefix/share/aclocal"
+        -I "$BUILD_PREFIX_M/Library/mingw-w64/share/aclocal"
+    )
+    autoreconf "${autoreconf_args[@]}"
+fi
+
+export PKG_CONFIG_LIBDIR=$uprefix/lib/pkgconfig:$uprefix/share/pkgconfig
 
 mkdir build
 cd build
 
-if [[ "$target_platform" == "linux-ppc64le" ]]; then
-  # HOST="powerpc64le-conda-linux-gnu" masks the fact that we are only
-  # building for power8 and uses an older POWER architecture.
-  GMP_HOST="power8-pc-linux-gnu"
-else
-  GMP_HOST=$HOST
-fi
+../configure --prefix="${PREFIX}" --enable-cxx --enable-fat --disable-static --enable-shared --host="${GMP_HOST}"
 
-../configure --prefix=$PREFIX --enable-cxx --enable-fat --host=$GMP_HOST
-
-make -j${CPU_COUNT} ${VERBOSE_AT}
-if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
-  make check -j${CPU_COUNT}
-fi
+make
+make check
 make install
-
-# This overlaps with libgcc-ng:
-rm -rf ${PREFIX}/share/info/dir
-
-if [[ "$target_platform" == "linux-ppc64le" ]]; then
-    # Build a Power9 library as well
-    cd .. && mkdir build2 && cd build2
-    CFLAGS=$(echo "${CFLAGS}" | sed "s/=power8/=power9/g")
-    ../configure --prefix=$PREFIX --enable-cxx --enable-fat --host="power9-pc-linux-gnu"
-    make -j${CPU_COUNT}
-    make install DESTDIR=$PWD/install
-    # Install just the library to $PREFIX/lib/power9
-    # Since $PREFIX/lib is in the rpath, newer glibc will look in
-    # $PREFIX/lib/power9 before $PREFIX/lib
-    # See Rpath token expansion in http://man7.org/linux/man-pages/man8/ld.so.8.html
-    # This is only done for powerpc because GMP has a fat binary for x86 and I
-    # couldn't find how to do it for arm64 and not sure whether that's beneficial.
-    mkdir -p $PREFIX/lib/power9
-    mkdir -p $PREFIX/lib/power10
-    cp $PWD/install$PREFIX/lib/libgmp.so.+([0-9]) $PREFIX/lib/power9
-    cp $PWD/install$PREFIX/lib/libgmp.so.+([0-9]) $PREFIX/lib/power10
-fi
