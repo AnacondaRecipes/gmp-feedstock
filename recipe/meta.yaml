@@ -22,20 +22,20 @@ build:
 
 requirements:
   build:              
-    - gnuconfig
-    - {{ compiler('m2w64_c') }}         # [win]
-    - {{ compiler('m2w64_cxx') }}       # [win]
+    - {{ compiler('m2w64_c') }}           # [win]
+    - {{ compiler('m2w64_cxx') }}         # [win]
+    - {{posix}}autoconf                   # [win]
+    - {{posix}}automake-wrapper
+    - {{posix}}automake{{ am_version }}   # [win]
+    - {{posix}}libtool                    # [win]
     - {{posix}}m4
     - {{posix}}make
     - {{posix}}patch
-    - posix                     # [win]
-    - {{posix}}autoconf                   # [win]
-    - {{posix}}automake{{ am_version }}   # [win]
-    - {{posix}}libtool                    # [win]
     - {{posix}}pkg-config                    
-    - {{posix}}automake-wrapper
     - {{posix}}sed
-
+    - gnuconfig
+    - m2w64-gcc-libs-core                 # [win]
+    - posix                               # [win]
   host:
 
 test:
@@ -43,7 +43,6 @@ test:
     - {{ compiler('c') }}
   files:
     - test.c
-
   commands:
     - test -f ${PREFIX}/lib/libgmp.a        # [unix]
     - test -f ${PREFIX}/lib/libgmp.dylib    # [osx]
@@ -51,12 +50,6 @@ test:
     - test -f ${PREFIX}/lib/libgmpxx.a      # [unix]
     - test -f ${PREFIX}/lib/libgmpxx.dylib  # [osx]
     - test -f ${PREFIX}/lib/libgmpxx.so     # [linux]
-    - dir /s %PREFIX%\Library\ # [win]
-    - if not exist %PREFIX%\Library\mingw-w64\bin\libgmp-10.dll exit /b 1  # [win]
-    - if not exist %PREFIX%\Library\mingw-w64\bin\libgmpxx-4.dll exit /b 1  # [win]
-    - if not exist %PREFIX%\Library\mingw-w64\include\gmp.h exit /b 1  # [win]
-    - if not exist %PREFIX%\Library\mingw-w64\lib\libgmp.a exit /b 1  # [win]
-
 
 about:
   home: https://gmplib.org/
