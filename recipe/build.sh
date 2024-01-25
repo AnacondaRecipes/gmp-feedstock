@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eou pipefail
 
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.guess config.fsf.guess
@@ -49,3 +49,9 @@ cd build
 make
 make check
 make install
+
+# Move the static library
+mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/Library/mingw-w64/lib/libgmp_static.lib
+
+# Move the import library to LIBRARY_LIB
+mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/Library/mingw-w64/lib/libgmp.lib

@@ -16,9 +16,3 @@ FOR /F "delims=" %%i IN ('cygpath.exe -u "%SRC_DIR%"') DO set "SRC_DIR=%%i"
 FOR /F "delims=" %%i IN ('cygpath.exe -u "%STDLIB_DIR%"') DO set "STDLIB_DIR=%%i"
 bash -x %saved_recipe_dir%\build.sh
 if errorlevel 1 exit 1
-
-REM Its makefile still don't know how to generate .lib instead of .a:
-REM This is the "static library"
-move %LIBRARY_PREFIX%\mingw-w64\lib\libgmp.a %LIBRARY_PREFIX%\mingw-w64\lib\libgmp_static.lib
-REM This is the "import library", note that it is moved to LIBRARY_LIB
-move %LIBRARY_PREFIX%\mingw-w64\lib\libgmp.dll.a %LIBRARY_PREFIX%\mingw-w64\lib\libgmp.lib
