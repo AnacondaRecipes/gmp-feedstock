@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eou pipefail
+set -e
 
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.guess config.fsf.guess
