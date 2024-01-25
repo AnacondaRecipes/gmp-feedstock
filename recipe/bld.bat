@@ -19,6 +19,6 @@ if errorlevel 1 exit 1
 
 REM Its makefile still don't know how to generate .lib instead of .a:
 REM This is the "static library"
-move %LIBRARY_LIB%\mingw-w64\lib\libgmp.a %LIBRARY_LIB%\mingw-w64\lib\libgmp_static.lib
+move %LIBRARY_PREFIX%\mingw-w64\lib\libgmp.a %LIBRARY_PREFIX%\mingw-w64\lib\libgmp_static.lib
 REM This is the "import library", note that it is moved to LIBRARY_LIB
-move %LIBRARY_BIN%\mingw-w64\lib\libgmp.dll.a %LIBRARY_LIB%\mingw-w64\lib\libgmp.lib
+move %LIBRARY_PREFIX%\mingw-w64\lib\libgmp.dll.a %LIBRARY_PREFIX%\mingw-w64\lib\libgmp.lib
