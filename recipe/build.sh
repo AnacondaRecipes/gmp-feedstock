@@ -44,14 +44,25 @@ export PKG_CONFIG_LIBDIR=$uprefix/lib/pkgconfig:$uprefix/share/pkgconfig
 mkdir build
 cd build
 
-../configure --prefix="${PREFIX}" --enable-cxx --enable-fat --disable-static --enable-shared --host="${GMP_HOST}"
+GMP_HOST=$HOST
+
+if [[ "$target_platform" == win* ]] ; then
+    ../configure --prefix="${PREFIX}" --enable-cxx --enable-fat --disable-static --enable-shared --host="${GMP_HOST}"
+else
+    ../configure --prefix="$PREFIX" --enable-cxx --enable-fat --host="$GMP_HOST"
+fi
 
 make
 make check
 make install
 
-# Move the static library
-mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/Library/mingw-w64/lib/libgmp_static.lib
 
-# Move the import library to LIBRARY_LIB
-mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/Library/mingw-w64/lib/libgmp.lib
+if [[ "$target_platform" != win* ]] ; then
+    # This overlaps with libgcc-ng: 
+    rm -rf "${PREFIX}"/share/info/dir
+else
+    # Move the static library
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/Library/mingw-w64/lib/libgmp_static.lib
+    # Move the import library to LIBRARY_LIB
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/Library/mingw-w64/lib/libgmp.lib
+fi

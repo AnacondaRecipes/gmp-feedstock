@@ -1,4 +1,4 @@
-{% set version = "6.2.1" %}
+{% set version = "6.3.0" %}
 {% set posix = 'm2-' if win else '' %}
 {% set am_version = "1.15" %} #  keep synchronized with build.sh
 
@@ -8,13 +8,12 @@ package:
 
 source:
   url: https://gmplib.org/download/gmp/gmp-{{ version }}.tar.bz2
-  sha256: eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c
+  sha256: ac28211a7cfb609bae2e2c8d6058d66c8fe96434f740cf6fe2e47b000d1c20cb
   patches:
     - 0000-Avoid-the-x18-register.patch
 
 build:
-  number: 4
-  skip: true  # [not win]
+  number: 0
   run_exports:
     # excellent, even across major ver:
     #  https://abi-laboratory.pro/tracker/timeline/gmp/
@@ -22,10 +21,12 @@ build:
 
 requirements:
   build:
-    - {{ compiler('m2w64_c') }}           # [win]
-    - {{ compiler('m2w64_cxx') }}         # [win]
+    - {{ compiler('c') }}           # [unix]
+    - {{ compiler('cxx') }}         # [unix]
+    - {{ compiler('m2w64_c') }}     # [win]
+    - {{ compiler('m2w64_cxx') }}   # [win]
     - {{posix}}autoconf                   # [win]
-    - {{posix}}automake-wrapper
+    - {{posix}}automake-wrapper           # [win]
     - {{posix}}automake{{ am_version }}   # [win]
     - {{posix}}libtool                    # [win]
     - {{posix}}m4
@@ -56,8 +57,17 @@ test:
 about:
   home: https://gmplib.org/
   license: GPL-2.0-or-later AND LGPL-3.0-or-later
-  license_file: COPYING.LESSERv3
+  license_family: Other
+  license_file:
+    - COPYING.LESSERv3
+    - COPYINGv2
+    - COPYINGv3
   summary: The GNU multiprecision library.
+  description: |
+    GNU MP is a portable library written in C for arbitrary precision arithmetic on integers,
+    rational numbers, and floating-point numbers.
+    It aims to provide the fastest possible arithmetic for all applications
+    that need higher precision than is directly supported by the basic C types.
   dev_url: https://gmplib.org/repo/
   doc_url: https://gmplib.org/manual/
 
