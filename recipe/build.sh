@@ -62,7 +62,7 @@ if [[ "$target_platform" != win* ]] ; then
     rm -rf "${PREFIX}"/share/info/dir
 else
     # Move the static library
-    mv "${PREFIX}"/lib/libgmp.a "${PREFIX}"/lib/libgmp_static.lib
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/lib/libgmp_static.lib
     # Move the import library to LIBRARY_LIB
-    mv "${PREFIX}"/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
 fi
