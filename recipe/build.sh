@@ -1,16 +1,12 @@
 #!/bin/bash
 
 set -e
-
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.guess config.fsf.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.sub config.fsf.sub
-
 IFS=$' \t\n' # workaround for conda 4.2.13+toolchain bug
-
 # Adopt a Unix-friendly path if we're on Windows (see bld.bat).
 [ -n "$PATH_OVERRIDE" ] && export PATH="$PATH_OVERRIDE"
-
 # On Windows we want $LIBRARY_PREFIX in both "mixed" (C:/Conda/...) and Unix
 # (/c/Conda) forms, but Unix form is often "/" which can cause problems.
 if [ -n "$LIBRARY_PREFIX_M" ] ; then
@@ -24,7 +20,6 @@ else
     mprefix="$PREFIX"
     uprefix="$PREFIX"
 fi
-
 # On Windows we need to regenerate the configure scripts.
 if [ -n "$CYGWIN_PREFIX" ] ; then
     am_version=1.15 # keep sync'ed with meta.yaml
@@ -38,31 +33,37 @@ if [ -n "$CYGWIN_PREFIX" ] ; then
     )
     autoreconf "${autoreconf_args[@]}"
 fi
-
 export PKG_CONFIG_LIBDIR=$uprefix/lib/pkgconfig:$uprefix/share/pkgconfig
 
-mkdir build
+mkdir -p build
 cd build
 
-GMP_HOST=$HOST
+GMP_HOST="$HOST"
 
 if [[ "$target_platform" == win* ]] ; then
-    ../configure --prefix="${PREFIX}" --enable-cxx --enable-fat --disable-static --enable-shared --host="${GMP_HOST}"
+    ../configure --prefix="${PREFIX}" --enable-cxx --host="${GMP_HOST}"
 else
     ../configure --prefix="$PREFIX" --enable-cxx --enable-fat --host="$GMP_HOST"
 fi
 
 make
 make check
-make install
+make install -j"${CPU_COUNT}"
 
 
 if [[ "$target_platform" != win* ]] ; then
-    # This overlaps with libgcc-ng: 
+    # This overlaps with libgcc-ng:
     rm -rf "${PREFIX}"/share/info/dir
 else
-    # Move the static library
-    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/lib/libgmp_static.lib
+    # Move the static library to LIBRARY_LIB
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/Library/lib/libgmp_static.lib
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmpxx.a "${PREFIX}"/Library/lib/libgmpxx_static.lib
     # Move the import library to LIBRARY_LIB
-    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/Library/lib/libgmp.lib
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmpxx.dll.a "${PREFIX}"/Library/lib/libgmpxx.lib
+    # Move files to PREFIX_LIBRARY
+    mv "${PREFIX}"/Library/mingw-w64/bin/libgmp-10.dll "${PREFIX}"/Library/bin/libgmp-10.dll
+    mv "${PREFIX}"/Library/mingw-w64/bin/libgmpxx-4.dll "${PREFIX}"/Library/bin/libgmpxx-4.dll
+    mv "${PREFIX}"/Library/mingw-w64/include/gmp.h "${PREFIX}"/Library/include/gmp.h
+    mv "${PREFIX}"/Library/mingw-w64/include/gmpxx.h "${PREFIX}"/Library/include/gmpxx.h
 fi
