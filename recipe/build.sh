@@ -60,17 +60,15 @@ make install
 if [[ "$target_platform" != win* ]] ; then
     # This overlaps with libgcc-ng:
     rm -rf "${PREFIX}"/share/info/dir
-    
-    # Move files to LIBRARY_LIB
-    mv "${PREFIX}"/Library/mingw-w64/bin/libgmp-10.dll "${PREFIX}"/Library/bin/libgmp-10.dll
-    mv "${PREFIX}"/Library/mingw-w64/bin/libgmpxx-4.dll "${PREFIX}"/Library/bin/libgmpxx-4.dll
-    mv "${PREFIX}"/Library/mingw-w64/include/gmp.h "${PREFIX}"/Library/include/gmp.h
-    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.lib "${PREFIX}"/Library/lib/libgmp.lib
-    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp_static.lib "${PREFIX}"/Library/lib/libgmp_static.lib
-    
 else
     # Move the static library
     mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.a "${PREFIX}"/lib/libgmp_static.lib
     # Move the import library to LIBRARY_LIB
     mv "${PREFIX}"/Library/mingw-w64/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
+    # Move files to LIBRARY_LIB
+    mv "${PREFIX}"/Library/mingw-w64/bin/libgmp-10.dll "${PREFIX}"/Library/bin/libgmp-10.dll
+    mv "${PREFIX}"/Library/mingw-w64/bin/libgmpxx-4.dll "${PREFIX}"/Library/bin/libgmpxx-4.dll
+    mv "${PREFIX}"/Library/mingw-w64/include/gmp.h "${PREFIX}"/Library/include/gmp.h
+    mv "${PREFIX}"/Library/mingw-w64/lib/libgmp_static.lib "${PREFIX}"/Library/lib/libgmp_static.lib
+    
 fi
