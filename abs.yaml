@@ -1,0 +1,6 @@
+build_parameters:
+  # 2024/3/7: We got an error on our CI but it's warniing on the WinDevBoxes:
+  # WARNING (gmp,Library/bin/libgmpxx-4.dll): .. but ['defaults/win-64::m2w64-gcc-libs-core==5.3.0=7'] not in reqs/run, 
+  # (i.e. it is overlinking) (likely) or a missing dependency (less likely)
+  # Seems 'gmp' doesn't really need 'm2w64-gcc-libs-core  # [win]'' at runtime
+  - "--no-error-overlinking"
