@@ -40,7 +40,7 @@ ls -l
 
 # Move import libraries
 cp "${PREFIX}"/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
-cp "${PREFIX}"/lib/libgmpxx.dll.a "${PREFIX}"/Library/libgmpxx.lib
+cp "${PREFIX}"/lib/libgmpxx.dll.a "${PREFIX}"/lib/libgmpxx.lib
 # Move dynamic libraries
 #cp "${PREFIX}"/bin/libgmp-10.dll "${PREFIX}"/Library/bin/libgmp-10.dll
 #cp "${PREFIX}"/bin/libgmpxx-4.dll "${PREFIX}"/Library/bin/libgmpxx-4.dll

@@ -16,7 +16,11 @@ REM static libraries:
 @REM if not exist %PREFIX%\Library\include\gmpxx.h exit /b 1
 
 REM compile a file with an import library
-%CC% /Tc test.c /I %CONDA_PREFIX%\include /link /LIBPATH:"%CONDA_PREFIX%\lib" libgmp.lib /out:test.exe
+%CC% /MD /Fetest test.c /I%PREFIX%\include /link /LIBPATH:"%PREFIX%\lib" libgmp.lib
+
+REM Uncomment for the debugging purposes only to check the dynamic libraries
+ldd test.exe
+if errorlevel 1 exit /B 1
 
 if errorlevel 1 exit /B 1
 REM execute the output
