@@ -32,6 +32,7 @@ requirements:
     - {{posix}}make
     - {{posix}}patch
     - {{posix}}pkg-config
+    - m2w64-pkg-config              # [win]
     - {{posix}}sed
     - gnuconfig
     - m2w64-gcc-libs-core                 # [win]
