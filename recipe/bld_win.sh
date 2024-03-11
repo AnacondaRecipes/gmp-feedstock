@@ -10,8 +10,8 @@ mkdir -p "static" && cd "static"
 
 ../configure --prefix="${PREFIX}" --host="${HOST}" --enable-cxx --enable-static --disable-shared
 
-make -j${CPU_COUNT} ${VERBOSE_AT}
-make check
+make -j${CPU_COUNT}
+make check -j${CPU_COUNT}
 make install
 
 # Copy the static libraries with the '_static' suffix
