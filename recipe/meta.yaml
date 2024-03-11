@@ -22,20 +22,17 @@ requirements:
   build:
     - {{ compiler('c') }}                 # [unix]
     - {{ compiler('cxx') }}               # [unix]
-    - m2w64-toolchain      # [win]
+    - gnuconfig                           # [unix]
+    - m4                                  # [unix]
+    - make                                # [unix]
+    - m2w64-toolchain                     # [win]
+    # m2-autoconf includes m2-m4 for win
     - {{posix}}autoconf                   # [win]
     - {{posix}}automake-wrapper           # [win]
     - {{posix}}automake{{ am_version }}   # [win]
     - {{posix}}libtool                    # [win]
-    - {{posix}}m4
-    - {{posix}}make
-    - {{posix}}patch
-    - {{posix}}pkg-config
-    - m2w64-pkg-config              # [win]
-    - {{posix}}sed
-    - gnuconfig
-    - m2w64-gcc-libs-core                 # [win]
     - posix                               # [win]
+    - {{posix}}pkg-config
 
 test:
   requires:
@@ -49,6 +46,7 @@ test:
     - test -f ${PREFIX}/lib/libgmpxx.a      # [unix]
     - test -f ${PREFIX}/lib/libgmpxx.dylib  # [osx]
     - test -f ${PREFIX}/lib/libgmpxx.so     # [linux]
+    # tests for win64 are included to run_test.bat
 
 about:
   home: https://gmplib.org/
