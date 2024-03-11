@@ -27,8 +27,8 @@ mkdir -p "shared" && cd "shared"
 
 ../configure --prefix="${PREFIX}" --host="${HOST}" --enable-cxx --enable-shared --disable-static
 
-make -j${CPU_COUNT} ${VERBOSE_AT}
-make check
+make -j${CPU_COUNT}
+make check -j${CPU_COUNT}
 make install
 
 # Copy import libraries as on Windows we need '.lib' instead of '.dll.a'
