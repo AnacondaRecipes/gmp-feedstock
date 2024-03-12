@@ -17,3 +17,7 @@ mkdir -p "shared" && cd "shared"
 make -j${CPU_COUNT}
 make check -j${CPU_COUNT}
 make install
+
+# Copy import libraries
+cp "${PREFIX}"/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
+cp "${PREFIX}"/lib/libgmpxx.dll.a "${PREFIX}"/lib/libgmpxx.lib
