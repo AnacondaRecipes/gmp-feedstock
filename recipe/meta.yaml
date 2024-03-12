@@ -36,9 +36,9 @@ requirements:
 
 test:
   requires:
-    - {{ compiler('c') }}  # [unix]
+    - {{ compiler('c') }}
   files:
-    - test.c  # [unix]
+    - test.c
   commands:
     - test -f ${PREFIX}/lib/libgmp.a        # [unix]
     - test -f ${PREFIX}/lib/libgmp.dylib    # [osx]
