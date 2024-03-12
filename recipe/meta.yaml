@@ -36,9 +36,9 @@ requirements:
 
 test:
   requires:
-    - {{ compiler('c') }}
+    - {{ compiler('c') }}  # [unix]
   files:
-    - test.c
+    - test.c  # [unix]
   commands:
     - test -f ${PREFIX}/lib/libgmp.a        # [unix]
     - test -f ${PREFIX}/lib/libgmp.dylib    # [osx]
@@ -50,7 +50,7 @@ test:
 
 about:
   home: https://gmplib.org/
-  license: GPL-2.0-or-later AND LGPL-3.0-or-later
+  license: GPL-2.0-or-later OR LGPL-3.0-or-later
   license_family: Other
   license_file:
     - COPYING.LESSERv3
