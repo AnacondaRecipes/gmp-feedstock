@@ -12,12 +12,10 @@ export CFLAGS="${CFLAGS} -Wno-attributes -Wno-ignored-attributes"
 # To be aware: 'make' can build only one library at a time: shared or static but not both.
 mkdir -p "shared" && cd "shared"
 
-../configure --prefix="${PREFIX}" --host="${HOST}" --enable-cxx --enable-fat --enable-shared --disable-static
+../configure --prefix="${LIBRARY_PREFIX_MIXED}" --host="${HOST}" --enable-cxx --enable-fat --enable-shared --disable-static
 
 make -j${CPU_COUNT}
-make check -j${CPU_COUNT}
+if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
+		make check -j${CPU_COUNT}
+fi
 make install
-
-# Copy import libraries
-cp "${PREFIX}"/lib/libgmp.dll.a "${PREFIX}"/lib/libgmp.lib
-cp "${PREFIX}"/lib/libgmpxx.dll.a "${PREFIX}"/lib/libgmpxx.lib
