@@ -1,7 +1,7 @@
 #!/bin/bash
 # Get an updated config.sub and config.guess
-cp $BUILD_PREFIX/share/gnuconfig/config.guess config.fsf.guess
-cp $BUILD_PREFIX/share/gnuconfig/config.sub config.fsf.sub
+cp $BUILD_PREFIX/share/gnuconfig/config.guess config.fsf.guess || (echo "Failed to copy $BUILD_PREFIX/share/gnuconfig/config.guess" && exit 1)
+cp $BUILD_PREFIX/share/gnuconfig/config.sub config.fsf.sub  || (echo "Failed to copy $BUILD_PREFIX/share/gnuconfig/config.sub" && exit 2)
 
 shopt -s extglob
 chmod +x configure
@@ -12,27 +12,35 @@ cd build
 if [[ "$target_platform" == "linux-ppc64le" ]]; then
   # HOST="powerpc64le-conda-linux-gnu" masks the fact that we are only
   # building for power8 and uses an older POWER architecture.
-  GMP_HOST="power8-pc-linux-gnu"
+  CONFIGURE_ARGS="--host=power8-pc-linux-gnu"
 else
-  GMP_HOST=$HOST
+  CONFIGURE_ARGS="--host=$HOST"
 fi
 
-../configure --prefix=$PREFIX --enable-cxx --enable-fat --host=$GMP_HOST
+CONFIGURE_ARGS="$CONFIGURE_ARGS --enable-cxx"
 
-make -j${CPU_COUNT} ${VERBOSE_AT}
+../configure \
+  --prefix=${PREFIX} \
+  --enable-fat \
+  --enable-shared \
+  $CONFIGURE_ARGS
+
+if [[ $? != 0 ]]; then
+  cat config.log
+  exit 1
+fi
+
+make -j${CPU_COUNT}
 if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
   make check -j${CPU_COUNT}
 fi
 make install
 
-# This overlaps with libgcc-ng:
-rm -rf ${PREFIX}/share/info/dir
-
 if [[ "$target_platform" == "linux-ppc64le" ]]; then
     # Build a Power9 library as well
     cd .. && mkdir build2 && cd build2
     CFLAGS=$(echo "${CFLAGS}" | sed "s/=power8/=power9/g")
-    ../configure --prefix=$PREFIX --enable-cxx --enable-fat --host="power9-pc-linux-gnu"
+    ../configure --prefix=${PREFIX} $CONFIGURE_ARGS --host="power9-pc-linux-gnu"
     make -j${CPU_COUNT}
     make install DESTDIR=$PWD/install
     # Install just the library to $PREFIX/lib/power9

@@ -1,56 +1,87 @@
-{% set version = "6.2.1" %}
+{% set version = "6.3.0" %}
+{% set lib_major_version = "10" %}
+{% set libxx_major_version = "4" %}
 
 package:
   name: gmp
   version: {{ version }}
 
 source:
-  url: https://gmplib.org/download/gmp/gmp-{{ version }}.tar.bz2
-  sha256: eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c
+  url:
+    https://gmplib.org/download/gmp/gmp-{{ version }}.tar.xz
+#    - https://ftp.gnu.org/gnu/gmp/gmp-{{ version }}.tar.xz
+  sha256: a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898
   patches:
-    - 0000-Avoid-the-x18-register.patch
+    - 0001-Remove-unguarded-import.patch  # [win]
 
 build:
-  number: 3
-  skip: true  # [win]
+  number: 0
   run_exports:
-    # excellent, even across major ver:
-    #  https://abi-laboratory.pro/tracker/timeline/gmp/
     - {{ pin_subpackage("gmp") }}
+  script_env:
+    # Sets values in win_build/CMakeList.txt
+    - PROJECT_VERSION={{ version }}                  # [win]
+    - LIB_MAJOR_VERSION={{ lib_major_version }}      # [win]
+    - LIBXX_MAJOR_VERSION={{ libxx_major_version }}  # [win]
 
 requirements:
   build:
-    - gnuconfig  # [unix]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - m4
-    - make
-    - patch  # [unix]
+    - m2-patch   # [win]
+    - cmake      # [win]
+    - gnuconfig  # [unix]
+    - m4         # [unix]
+    - make       # [unix]
   host:
+  run_constrained:
+    - mpir <0.0a0   # [win]
 
 test:
   requires:
     - {{ compiler('c') }}
   files:
     - test.c
-
   commands:
-    - test -f ${PREFIX}/lib/libgmp.a        # [unix]
-    - test -f ${PREFIX}/lib/libgmp.dylib    # [osx]
-    - test -f ${PREFIX}/lib/libgmp.so       # [linux]
-    - test -f ${PREFIX}/lib/libgmpxx.a      # [unix]
-    - test -f ${PREFIX}/lib/libgmpxx.dylib  # [osx]
-    - test -f ${PREFIX}/lib/libgmpxx.so     # [linux]
+    - test -f ${PREFIX}/lib/libgmp{{ SHLIB_EXT }}.{{ lib_major_version }} || (echo "Failed to find libgmp{{ SHLIB_EXT }}.{{ lib_major_version }}" && exit 1)          # [linux]
+    - test -f ${PREFIX}/lib/libgmpxx{{ SHLIB_EXT }}.{{ libxx_major_version }} || (echo "Failed to find libgmpxx{{ SHLIB_EXT }}.{{ libxx_major_version }}" && exit 2)  # [linux]
+    - test -f ${PREFIX}/lib/libgmp.{{ lib_major_version }}{{ SHLIB_EXT }} || (echo "Failed to find libgmp.{{ lib_major_version }}{{ SHLIB_EXT }}" && exit 1)          # [osx]
+    - test -f ${PREFIX}/lib/libgmpxx.{{ libxx_major_version }}{{ SHLIB_EXT }} || (echo "Failed to find libgmpxx.{{ libxx_major_version }}{{ SHLIB_EXT }}" && exit 2)  # [osx]
+    - test -f ${PREFIX}/lib/libgmp{{ SHLIB_EXT }} || (echo "Failed to find libgmp{{ SHLIB_EXT }}" && exit 3)      # [unix]
+    - test -f ${PREFIX}/lib/libgmpxx{{ SHLIB_EXT }} || (echo "Failed to find libgmpxx{{ SHLIB_EXT }}" && exit 4)  # [unix]
+    - test -f ${PREFIX}/lib/libgmp.a || (echo "Failed to find libgmp.a" && exit 5)                                # [unix]
+    - test -f ${PREFIX}/lib/libgmpxx.a || (echo "Failed to find libgmp.a" && exit 6)                              # [unix]
+    - eval "${CC} -I ${PREFIX}/include -L ${PREFIX}/lib test.c -lgmp -Wl,-rpath,${PREFIX}/lib -o test.out"        # [unix]
+    - ./test.out                                                                                                  # [unix]
+    - if not exist %LIBRARY_BIN%\libgmp-{{ lib_major_version }}.dll exit 1            # [win]
+    - if not exist %LIBRARY_LIB%\libgmp.dll.a exit 2                                  # [win]
+    - if not exist %LIBRARY_LIB%\libgmp.lib exit 3                                    # [win]
+    - if not exist %LIBRARY_LIB%\gmp.lib exit 4                                       # [win]
+    - if not exist %LIBRARY_BIN%\libgmpxx-{{ libxx_major_version }}.dll exit 5        # [win]
+    - if not exist %LIBRARY_LIB%\libgmpxx.dll.a exit 6                                # [win]
+    - if not exist %LIBRARY_LIB%\libgmpxx.lib exit 7                                  # [win]
+    - if not exist %LIBRARY_LIB%\gmpxx.lib exit 8                                     # [win]
+    # Test whether libgmp.dll.a and gmp.lib work.
+    - cl.exe -I%LIBRARY_INC% %RECIPE_DIR%\test.c /Fe"%cd%\test.exe" /link /LIBPATH:"%LIBRARY_LIB%" libgmp.dll.a  # [win]
+    - .\test.exe                                                                                                 # [win]
+    - cl.exe -I%LIBRARY_INC% %RECIPE_DIR%\test.c /Fe"%cd%\test.exe" /link /LIBPATH:"%LIBRARY_LIB%" gmp.lib       # [win]
+    - .\test.exe                                                                                                 # [win]
 
 about:
   home: https://gmplib.org/
   license: GPL-2.0-or-later AND LGPL-3.0-or-later
   license_file: COPYING.LESSERv3
+  license_family: GPL
   summary: The GNU multiprecision library.
-  dev_url: https://gmplib.org/repo/
+  description: GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers,
+    and floating-point numbers. There is no practical limit to the precision except the ones implied by the available
+    memory in the machine GMP runs on. GMP has a rich set of functions, and the functions have a regular interface.
+  dev_url: https://gmplib.org/repo/gmp/  # mercurial, so gives a 403 when curled during linting
   doc_url: https://gmplib.org/manual/
 
 extra:
+  skip-lints:
+    - invalid_url
   recipe-maintainers:
     - asmeurer
     - isuruf
