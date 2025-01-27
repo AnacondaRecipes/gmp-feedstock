@@ -1,0 +1,22 @@
+From 9500d9c7554037abeed06c91dd0d2177e680dd35 Mon Sep 17 00:00:00 2001
+From: Brian Wing <bwing@anaconda.com>
+Date: Mon, 20 Jan 2025 19:06:20 +0000
+Subject: [PATCH] Remove unguarded import
+
+---
+ mpz/perfsqr.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/mpz/perfsqr.c b/mpz/perfsqr.c
+index 534f10f..5778dde 100644
+--- a/mpz/perfsqr.c
++++ b/mpz/perfsqr.c
+@@ -30,5 +30,3 @@ GNU Lesser General Public License along with the GNU MP Library.  If not,
+ see https://www.gnu.org/licenses/.  */
+ 
+ #define __GMP_FORCE_mpz_perfect_square_p 1
+-
+-#include "gmp-impl.h"
+-- 
+2.45.2.windows.1
+
