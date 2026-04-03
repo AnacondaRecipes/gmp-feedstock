@@ -1,0 +1,5 @@
+anaconda_config_version: 1
+upstream_sources:
+  - webpage:
+      url: https://gmplib.org/download/gmp/gmp-{}.tar.bz2
+      regex: gmp-([\d.]+)\.tar\.xz
